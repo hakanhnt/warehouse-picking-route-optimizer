@@ -1,4 +1,9 @@
 .dist
 venv/*
+.venv/
+__pycache__/
+**/__pycache__/
+*.py[cod]
+static/out/
 App/*
 notes.txt

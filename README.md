@@ -1,4 +1,8 @@
-# Improve Warehouse Productivity using Order Batching with Python 📦
+# Warehouse Picking Route Optimizer - Enhanced Fork 📦
+
+This repository is an enhanced fork of Samir Saci's original warehouse order batching and picking route optimisation project. The original work provides the modelling foundation, article references, sample dataset structure, and baseline Streamlit application.
+
+This fork extends the application into a richer Streamlit analytics dashboard with updated routing options, dataset validation, trolley constraints, multi-picker assignment, zone picking, route inspection, and active dataset management.
 
 In a **Distribution Centre (DC)**, walking time between locations during the picking route can account for 60%-70% of an operator’s working time. Reducing this walking time is the most effective way to increase your DC overall productivity.
 
@@ -10,15 +14,28 @@ In a **Distribution Centre (DC)**, walking time between locations during the pic
 <p align="center"><b>Scenario 1:</b> Picking routes with 1 order picked per wave</p>>
 
 
-I have published a series of articles proposing an approach to design a model that simulates the impact of multiple picking processes and routing methods to identify optimal order picking using the Single Picker Routing Problem (SPRP) for a two-dimensional warehouse model (axis-x, axis-y).
+Samir Saci published a series of articles proposing an approach to design a model that simulates the impact of multiple picking processes and routing methods to identify optimal order picking using the Single Picker Routing Problem (SPRP) for a two-dimensional warehouse model (axis-x, axis-y).
 
 SPRP is a specific application of the general **Travelling Salesman Problem (TSP)** answering the question:
 
 >  “Given a list of storage locations and the distances between each pair of locations, what is the shortest possible route that visits each storage location and returns to the depot ?”
 
-This repo contains a ready-to-use **Streamlit App** designed for **Logistics Engineers** to test these different strategies by only uploading their own dataset of order line records.
+This enhanced fork contains a ready-to-use **Streamlit App** designed for **Logistics Engineers** to test these strategies by uploading their own order line records, configuring warehouse constraints, and comparing routing and batching scenarios.
 
-### Understand the theory behind 📜
+## Fork enhancements
+
+Compared with the original baseline application, this fork adds:
+
+- A multi-tab Streamlit dashboard with KPI cards and route inspection workflows.
+- CSV upload, schema validation, and active dataset management.
+- OR-Tools TSP routing as an alternative to the greedy next-closest-location heuristic.
+- Independent wave range controls for batch and clustering simulations.
+- Trolley capacity constraints by total pieces and order lines.
+- Optional X-axis zone picking and multi-picker wave assignment.
+- Route inspector filters by simulation, clustering method, wave size, zone, picker, and wave ID.
+- Process-pool fallback behavior for restricted environments where multiprocessing is not available.
+
+### Original theory and references 📜
 - Improve Warehouse Productivity using Order Batching with Python - [Article](https://www.samirsaci.com/improve-warehouse-productivity-using-order-batching-with-python/)
 - Improve Warehouse Productivity using Spatial Clustering with Python Scipy - [Article](https://www.samirsaci.com/improve-warehouse-productivity-using-spatial-clustering-with-python/)
 - Design Pathfinding Algorithm using Google AI to Improve Warehouse Productivity - [Article](https://www.samirsaci.com/improve-warehouse-productivity-using-pathfinding-algorithm-with-python/)
@@ -231,119 +248,128 @@ We’ll be testing three different methods:
 - Method 2 vs. Method 1: Clustering for mono-line orders reduce the walking distance by 34%
 - Method 3 vs. Method 2: Clustering for mono-line orders reduce the walking distance by 10%
 
-# Build the application locally 🏗️ 
+# Build the application locally 🏗️
 
-Because the resources provided by Streamlit Cloud or Heroku are limited, I suggest running this application locally.
+The current version is a Streamlit dashboard for local warehouse picking simulation. It supports wave-size optimisation, spatial clustering, trolley constraints, optional zone picking, multi-picker route assignment, OR-Tools TSP routing, CSV upload, and active dataset inspection.
 
-## **Build a Python local environment (recommended)** 
+## Requirements
 
-### Then install **virtualenv** using pip3
-```
-    sudo pip3 install virtualenv
-```
+- Python 3.14 is used in the included `.venv`.
+- Dependencies are pinned in `requirements.txt`.
+- The default sample dataset is `static/in/df_lines.csv`.
 
-### Now, create a virtual environment 
-```
-    virtualenv venv
-```
-  
-### Active your virtual environment    
-```
-    source venv/bin/activate
-```
-  
-## Launch Streamlit 🚀
+## Quick start
 
-### Install all dependencies needed using requirements.txt
+If the repository already contains the local virtual environment:
 
-```
-     pip install -r requirements.txt
+```bash
+./.venv/bin/streamlit run app.py
 ```
 
-### Run the application  
+Then open:
+
+```text
+http://localhost:8501
 ```
-    streamlit run app.py --server.address 0.0.0.0
+
+If you need to create a fresh environment:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+streamlit run app.py
 ```
 
-### Click on the URL   
-<p align="center">
-  <a href="https://www.samirsaci.com/improve-warehouse-productivity-using-order-batching-with-python/" target="_blank" rel="noopener noreferrer">
-    <img align="center" src="static/img/launch_streamlit.png" style="max-width: 50%; height: auto;">
-  </a>
-</p>
-<p align="center"><b>Instructions:</b> Click on the URL</p>
-  
-> -> Enjoy!
+For remote or container usage, expose Streamlit explicitly:
 
-# Use the application 🖥️ 
-> This app has not been deployed; you need to use it locally/.
+```bash
+streamlit run app.py --server.address 0.0.0.0
+```
 
-## **Why should you use it?**
-This Streamlit Web Application has been designed for Supply Chain Engineers to help them simulate the impact on picking route optimization on the total distance of their picking operators.
+## CSV input format
 
-## **Load the data**
+Custom uploaded CSV files are validated before simulation. Required columns:
 
-- You can use the dataset located in the folder 
- In/df_lines.csv
-- You can build your own dataset following the steps of ('Initial Step') above
+| Column | Description | Example |
+| --- | --- | --- |
+| `DATE` | Order date or timestamp used for chronological wave mapping | `12/11/2018` |
+| `OrderNumber` | Order identifier | `3780678` |
+| `SKU` | Item/reference identifier per order line | `399573` |
+| `PCS` | Piece quantity per order line | `1` |
+| `Coord` | Picking coordinate as a stringified 2D list | `"[19.5, 21.0]"` |
 
-## 🔬 Experiment 1
-<p align="center">
-  <a href="https://www.samirsaci.com/improve-warehouse-productivity-using-order-batching-with-python/" target="_blank" rel="noopener noreferrer">
-    <img align="center" src="static/img/params_1.PNG" style="max-width: 75%; height: auto;">
-  </a>
-</p>
-<p align="center"><b>Experiment 1:</b> Parameters</p>
+Coordinates should match the warehouse coordinate system configured in the sidebar. When zone picking is enabled, the X value in `Coord` is used to split order lines into zones.
 
-### **Step 1:** Scope
+# Use the application 🖥️
 
-As the computation time can increase exponentially with the size of the dataset _(optimisation can be done)_ you can ask the model to take only the first n thousand lines for analysis.
+## Sidebar controls
 
-### **Step 2:** Fix the range of orders/wave to simulate
+- **Warehouse Layout Parameters**: configure aisle lower/upper Y boundaries and depot coordinates.
+- **Clustering Distance Threshold**: sets the maximum walking-distance threshold for spatial clustering.
+- **Trolley Capacity Constraints**: optionally limit wave size by max pieces (`PCS`) and max order lines.
+- **Multi-Picker & Zoning Options**:
+  - Enable zone picking with an X-coordinate split.
+  - Select the number of pickers for disjoint wave assignment.
+- **Dataset Upload**: upload a validated WMS order-line CSV.
+- **Routing Algorithm**:
+  - `Google OR-Tools (TSP)` for route optimisation.
+  - `Next Closest Location (Greedy)` for faster heuristic routing.
 
-In the picture below, we ask the model to run a loop testing scenarios with the number of orders per wave varying between 1 and 10.
+## Dashboard tabs
 
-### **Step 3:** START CALCULATION
+### 1. Batch Size Optimizer
 
-Click the button to start the calculations.
+Simulates chronological order batching across a configurable range of orders per wave.
 
-### **Final Results**
-<p align="center">
-  <a href="https://www.samirsaci.com/improve-warehouse-productivity-using-order-batching-with-python/" target="_blank" rel="noopener noreferrer">
-    <img align="center" src="static/img/batch_results.png" style="max-width: 75%; height: auto;">
-  </a>
-</p>
-<p align="center"><b>Experiment 1:</b> Final Results</p>
+- Choose simulation scope in thousands of order lines.
+- Set independent `N_MIN` and `N_MAX` values.
+- Compare total walking distance by wave size.
+- Review KPIs for optimal wave size, minimum distance, and selected routing algorithm.
+- Supports trolley limits, optional X-zone splitting, and multi-picker assignment.
 
-💡 This is the same graph as the one presented in the article 
+### 2. Clustering Optimizer
 
-## 🧪 Experiment 2
-<p align="center">
-  <a href="https://www.samirsaci.com/improve-warehouse-productivity-using-order-batching-with-python/" target="_blank" rel="noopener noreferrer">
-    <img align="center" src="static/img/params_2.PNG" style="max-width: 75%; height: auto;">
-  </a>
-</p>
-<p align="center"><b>Experiment 2:</b> Parameters</p>>
+Compares three wave creation strategies:
 
-### **Step 1:** Scope
+- **Method 1**: no clustering (`normal-normal`).
+- **Method 2**: clustering single-line orders only (`clustering-normal`).
+- **Method 3**: clustering single-line orders and multi-line order centroids (`clustering-clustering`).
 
-As the computation time can increase exponentially with the size of the dataset _(optimisation can be done)_ you can ask the model to take only the first n thousand lines for analysis.
+The optimizer reports the best clustered wave size, minimum clustered distance, and distance savings versus the no-clustering baseline. Simulation 2 has its own independent `N_MIN` and `N_MAX` controls.
 
-### **Step 2:** START CALCULATION
+### 3. Interactive Route Inspector
 
-Click the button to start the calculations.
+Inspect saved routes from Simulation 1 or Simulation 2.
 
-### **Final Results**
-<p align="center">
-  <a href="https://www.samirsaci.com/improve-warehouse-productivity-using-order-batching-with-python/" target="_blank" rel="noopener noreferrer">
-    <img align="center" src="static/img/streamlit_picking_route.png" style="max-width: 75%; height: auto;">
-  </a>
-</p>
-<p align="center"><b>Experiment 2:</b> Final Results</p>>
+- Filter by wave size, clustering method, zone, picker, and wave ID.
+- View route KPIs for selected wave, zone, picker, distance, and pick count.
+- Display the full numbered route or step through the sequence interactively.
+- The route view shows warehouse aisles, racks, depot, direction arrows, picked locations, pending locations, and optional zone split line.
 
-💡 This is the same graph with the one presented in the article 
+### 4. Data Manager
 
-## About me 🤓
-Senior Supply Chain and Data Science consultant with international experience working on Logistics and Transportation operations.\
-For **consulting or advising** on analytics and sustainable supply chain transformation, feel free to contact me via [Logigreen Consulting](https://www.logi-green.com/)\
-Please have a look at my personal blog: [Personal Website](https://samirsaci.com)
+Inspect and validate the active dataset used by the simulations.
+
+- View row count, unique orders, unique SKUs, total pieces, and missing values.
+- Confirm required simulation columns are present.
+- Explore pick-location density heatmaps.
+- Review piece quantity distribution and orders per date.
+- Uploaded datasets are stored in Streamlit session state and reused by simulator tabs.
+
+## Execution behavior
+
+The simulation engine tries to use `ProcessPoolExecutor` with a small worker cap for faster multi-core execution. If the runtime does not allow multiprocessing, the app automatically falls back to sequential execution instead of failing. This is useful for restricted local shells, hosted notebooks, and some sandboxed environments.
+
+## Credits and attribution
+
+This project is based on the original warehouse productivity and order batching work by **Samir Saci**.
+
+Original resources:
+
+- Original article series and methodology: [samirsaci.com](https://samirsaci.com)
+- Original consulting reference: [Logigreen Consulting](https://www.logi-green.com/)
+
+This fork keeps the original modelling context and references while adding new application features, UI improvements, routing options, validation, zoning, multi-picker workflows, and dataset management.
+
+If you publish this fork publicly, keep this attribution section so the original work remains clearly credited.
