@@ -303,6 +303,24 @@ Coordinates should match the warehouse coordinate system configured in the sideb
 
 # Use the application 🖥️
 
+## Application screenshots
+
+### Batch Size Optimizer
+
+![Batch Size Optimizer dashboard](static/img/readme_app_batch_optimizer.png)
+
+### Clustering Optimizer
+
+![Clustering Optimizer dashboard](static/img/readme_app_clustering_optimizer.png)
+
+### Interactive Route Inspector
+
+![Interactive Route Inspector dashboard](static/img/readme_app_route_inspector.png)
+
+### Data Manager
+
+![Data Manager dashboard](static/img/readme_app_data_manager.png)
+
 ## Sidebar controls
 
 - **Warehouse Layout Parameters**: configure aisle lower/upper Y boundaries and depot coordinates.
